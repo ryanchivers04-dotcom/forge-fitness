@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101010">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Forge Fitness">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Forge Fitness</title>
+<style>
+:root{--bg:#0b0c0d;--panel:#17191b;--panel2:#202326;--line:#303438;--text:#f4f4f1;--muted:#a4a9a7;--orange:#ff7a1a;--green:#a5e34b;--red:#ff665e}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+header{padding:22px 18px 15px;background:linear-gradient(135deg,#17191b,#0b0c0d);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3}
+.brand{font-size:22px;font-weight:950;letter-spacing:1.6px}.brand span{color:var(--orange)}.tag{font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:4px}
+main{max-width:760px;margin:auto;padding:17px}.screen{display:none}.screen.active{display:block}.section-title{font-size:21px;font-weight:850;margin:7px 0 14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px}.metric-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}.metric{font-size:27px;font-weight:900;margin:6px 0}.orange{color:var(--orange)}.green{color:var(--green)}.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}
+.progress{height:9px;background:#34383b;border-radius:20px;overflow:hidden;margin:10px 0}.progress>i{display:block;height:100%;background:var(--green);width:0;border-radius:20px}
+button,.btn{border:0;border-radius:11px;background:var(--orange);color:#151515;font-weight:850;padding:12px 14px;font-size:14px;cursor:pointer}.btn-secondary{background:var(--panel2);border:1px solid var(--line);color:var(--text)}.btn-green{background:var(--green)}.btn-danger{background:#48201e;color:#ffd7d3}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+input,select{width:100%;background:#101214;color:var(--text);border:1px solid #3a3f42;border-radius:10px;padding:12px;font-size:15px;margin:5px 0 11px;min-height:44px}label{font-size:12px;color:var(--muted);display:block;margin-top:7px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}.row strong{display:block}.pill{font-size:11px;padding:5px 8px;border-radius:20px;background:#2a3023;color:var(--green)}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:5;background:#121416;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+nav button{background:transparent;color:var(--muted);padding:8px 5px;font-size:11px;min-width:19%;font-weight:700}nav button.active{color:var(--orange)}nav b{display:block;font-size:19px;margin-bottom:3px}
+.food-entry,.exercise-entry{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+input[type=checkbox]{width:20px;min-height:20px;margin:0;accent-color:var(--green)}
+form .two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+canvas{width:100%;height:180px;background:#111315;border-radius:12px}
+.notice{border-left:3px solid var(--orange);padding:10px 12px;background:#211b16;border-radius:8px;color:#e9d5c5;font-size:12px;line-height:1.5}
+@media(min-width:650px){header{padding-left:max(18px,calc((100% - 760px)/2))}main{padding-top:25px}}
+</style>
+</head>
+<body>
+<header><div class="brand">FORGE <span>FITNESS</span></div><div class="tag">BUILD MUSCLE · LOSE FAT · GET STRONGER</div></header>
+<main>
+<section id="home" class="screen active">
+ <div class="section-title">Today's overview</div>
+ <div class="grid">
+  <div class="card"><div class="metric-label">Calories eaten</div><div class="metric" id="dashCal">0</div><div class="small" id="calSub">of 2,500 kcal</div><div class="progress"><i id="calBar"></i></div></div>
+  <div class="card"><div class="metric-label">Protein</div><div class="metric green" id="dashProtein">0g</div><div class="small" id="proteinSub">of 160g target</div><div class="progress"><i id="proteinBar"></i></div></div>
+  <div class="card"><div class="metric-label">Current weight</div><div class="metric" id="dashWeight">84 kg</div><div class="small">Starting weight: 84 kg</div></div>
+  <div class="card"><div class="metric-label">Water</div><div class="metric" id="waterCount">0/8</div><div class="actions"><button class="btn-secondary" onclick="changeWater(-1)">−</button><button class="btn-green" onclick="changeWater(1)">+ Glass</button></div></div>
+ </div>
+ <div class="card"><div class="section-title">This week's training</div><div id="weekSummary"></div></div>
+ <div class="card"><div class="section-title">Quick actions</div><div class="actions"><button onclick="showTab('food')">＋ Log food</button><button class="btn-secondary" onclick="showTab('gym')">＋ Log workout</button><button class="btn-secondary" onclick="showTab('progress')">View progress</button></div></div>
+ <div class="notice">Your calorie and protein goals are editable starting points, not medical advice. Adjust them based on progress, training and how you feel.</div>
+</section>
+<section id="gym" class="screen">
+ <div class="section-title">Training plan</div>
+ <div class="card" id="plans"></div>
+ <div class="card"><div class="section-title">Log an exercise</div>
+ <form id="exerciseForm"><label>Exercise</label><input id="exerciseName" placeholder="e.g. Bench press" required>
+ <div class="two"><div><label>Sets</label><input id="exerciseSets" type="number" min="1" value="3" required></div><div><label>Reps</label><input id="exerciseReps" type="number" min="1" value="10" required></div></div>
+ <div class="two"><div><label>Weight (kg)</label><input id="exerciseWeight" type="number" min="0" step="0.5" placeholder="e.g. 40"></div><div><label>Workout day</label><select id="exerciseDay"><option>Monday</option><option>Wednesday</option><option>Friday</option></select></div></div><button type="submit">Save exercise</button></form></div>
+ <div class="card"><div class="section-title">Exercise history</div><div id="exerciseHistory" class="small">No exercises logged yet.</div></div>
+</section>
+<section id="food" class="screen">
+ <div class="section-title">Food & nutrition</div>
+ <div class="grid"><div class="card"><div class="metric-label">Calories today</div><div class="metric" id="foodCal">0</div></div><div class="card"><div class="metric-label">Protein today</div><div class="metric green" id="foodProtein">0g</div></div></div>
+ <div class="card"><div class="section-title">Daily targets</div><form id="targetForm"><label>Calories (kcal)</label><input id="targetCalories" type="number" min="1" value="2500"><label>Protein (g)</label><input id="targetProtein" type="number" min="1" value="160"><button type="submit">Save targets</button></form></div>
+ <div class="card"><div class="section-title">Add food</div><form id="foodForm"><label>Food / meal</label><input id="foodName" placeholder="e.g. Chicken and rice" required><div class="two"><div><label>Calories (kcal)</label><input id="foodCalories" type="number" min="0" required></div><div><label>Protein (g)</label><input id="foodProteinInput" type="number" min="0" step="0.1" value="0"></div></div><button type="submit">Add to diary</button></form><p class="small">Enter values from the food label or a reliable nutrition database. Automatic barcode lookup is not connected in this version.</p></div>
+ <div class="card"><div class="section-title">Today's diary</div><div id="foodHistory" class="small">Nothing logged yet.</div></div>
+</section>
+<section id="vitamins" class="screen">
+ <div class="section-title">Vitamins & supplements</div>
+ <div class="card"><div class="small">Use this checklist to record products you already take. It does not tell you that you need them or recommend a dose.</div><div id="vitaminList"></div>
+ <form id="vitaminForm" style="margin-top:12px"><label>Add your own item</label><div class="two"><input id="vitaminName" placeholder="e.g. Prescribed supplement" required><button type="submit">Add item</button></div></form>
+ <div class="actions"><button class="btn-secondary" onclick="resetVitamins()">Reset today's checklist</button></div></div>
+ <div class="notice">Avoid stacking supplements with overlapping ingredients. Check labels and seek advice from a pharmacist or clinician if you're unsure about suitability or dosage.</div>
+</section>
+<section id="progress" class="screen">
+ <div class="section-title">Your progress</div>
+ <div class="card"><div class="section-title">Log your weight</div><form id="weightForm"><label>Weight (kg)</label><input id="weightInput" type="number" min="1" step="0.1" value="84"><button type="submit">Save weigh-in</button></form><div id="weightHistory" class="small"></div></div>
+ <div class="card"><div class="section-title">Weight history</div><canvas id="weightChart" width="640" height="240"></canvas><p class="small">Your weigh-ins are stored on this device.</p></div>
+ <div class="card"><div class="section-title">Settings & data</div><button class="btn-secondary" onclick="exportData()">Export my data (JSON)</button> <button class="btn-danger" onclick="clearData()">Clear all app data</button></div>
+</section>
+</main>
+<nav>
+ <button class="active" data-tab="home" onclick="showTab('home')"><b>⌂</b>Home</button>
+ <button data-tab="gym" onclick="showTab('gym')"><b>🏋</b>Gym</button>
+ <button data-tab="food" onclick="showTab('food')"><b>◉</b>Food</button>
+ <button data-tab="vitamins" onclick="showTab('vitamins')"><b>✚</b>Vitamins</button>
+ <button data-tab="progress" onclick="showTab('progress')"><b>↗</b>Progress</button>
+</nav>
+<script>
+const KEY='forgeFitness_v1';
+const defaults={targets:{calories:2500,protein:160},weight:84,weights:[{date:new Date().toISOString().slice(0,10),value:84}],food:[],water:0,exercises:[],plans:[{day:'Monday',name:'Upper body',done:false},{day:'Wednesday',name:'Lower body',done:false},{day:'Friday',name:'Full body',done:false}],vitamins:['Vitamin D','Omega 3','Magnesium','Vitamin C','Zinc','Multivitamin'].map(name=>({name,done:false}))};
+let data=load();
+function load(){try{return {...structuredClone(defaults),...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return structuredClone(defaults)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render()}
+function today(){return new Date().toISOString().slice(0,10)}
+function todayFood(){return data.food.filter(x=>x.date===today())}
+function totals(){return todayFood().reduce((a,x)=>({cal:a.cal+x.cal,protein:a.protein+x.protein}),{cal:0,protein:0})}
+function showTab(id){document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));if(id==='progress')drawChart();window.scrollTo(0,0)}
+function changeWater(n){data.water=Math.max(0,Math.min(8,data.water+n));save()}
+function render(){
+ const t=totals();document.getElementById('dashCal').textContent=t.cal;document.getElementById('dashProtein').textContent=t.protein.toFixed(1).replace(/\.0$/,'')+'g';document.getElementById('calSub').textContent=`of ${data.targets.calories.toLocaleString()} kcal`;document.getElementById('proteinSub').textContent=`of ${data.targets.protein}g target`;document.getElementById('calBar').style.width=Math.min(100,t.cal/data.targets.calories*100)+'%';document.getElementById('proteinBar').style.width=Math.min(100,t.protein/data.targets.protein*100)+'%';document.getElementById('dashWeight').textContent=data.weight+' kg';document.getElementById('waterCount').textContent=data.water+'/8';document.getElementById('foodCal').textContent=t.cal;document.getElementById('foodProtein').textContent=t.protein.toFixed(1)+'g';
+ document.getElementById('targetCalories').value=data.targets.calories;document.getElementById('targetProtein').value=data.targets.protein;
+ document.getElementById('weekSummary').innerHTML=data.plans.map((p,i)=>`<div class="row"><div><strong>${p.day}</strong><span class="small">${p.name}</span></div><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" ${p.done?'checked':''} onchange="togglePlan(${i},this.checked)"> Done</label></div>`).join('');
+ document.getElementById('plans').innerHTML=data.plans.map((p,i)=>`<div class="row"><div><strong>${p.day} · ${p.name}</strong><span class="small">${p.done?'Completed':'Scheduled'}</span></div><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" ${p.done?'checked':''} onchange="togglePlan(${i},this.checked)"> Done</label></div>`).join('');
+ const foods=todayFood();document.getElementById('foodHistory').innerHTML=foods.length?foods.map(x=>`<div class="food-entry"><div><strong>${esc(x.name)}</strong><div class="small">${x.cal} kcal · ${x.protein}g protein</div></div><button class="btn-danger" onclick="removeFood('${x.id}')">×</button></div>`).join(''):'Nothing logged yet.';
+ document.getElementById('exerciseHistory').innerHTML=data.exercises.length?data.exercises.slice().reverse().map(x=>`<div class="exercise-entry"><div><strong>${esc(x.name)}</strong><div class="small">${x.day} · ${x.sets} × ${x.reps} · ${x.weight||0} kg</div></div></div>`).join(''):'No exercises logged yet.';
+ document.getElementById('vitaminList').innerHTML=data.vitamins.map((v,i)=>`<div class="row"><div><strong>${esc(v.name)}</strong><span class="small">${v.done?'Marked taken today':'Not marked yet'}</span></div><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" ${v.done?'checked':''} onchange="toggleVitamin(${i},this.checked)"> Taken</label></div>`).join('');
+ document.getElementById('weightHistory').innerHTML=data.weights.slice().reverse().map(w=>`${w.date}: <strong>${w.value} kg</strong>`).join('<br>');
+ if(document.getElementById('progress').classList.contains('active'))drawChart();
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function togglePlan(i,v){data.plans[i].done=v;save()}function toggleVitamin(i,v){data.vitamins[i].done=v;save()}function resetVitamins(){data.vitamins.forEach(v=>v.done=false);save()}
+function removeFood(id){data.food=data.food.filter(x=>x.id!==id);save()}
+document.getElementById('foodForm').addEventListener('submit',e=>{e.preventDefault();data.food.push({id:crypto.randomUUID(),date:today(),name:document.getElementById('foodName').value,cal:Number(document.getElementById('foodCalories').value),protein:Number(document.getElementById('foodProteinInput').value)||0});e.target.reset();save()});
+document.getElementById('targetForm').addEventListener('submit',e=>{e.preventDefault();data.targets={calories:Number(document.getElementById('targetCalories').value),protein:Number(document.getElementById('targetProtein').value)};save()});
+document.getElementById('exerciseForm').addEventListener('submit',e=>{e.preventDefault();data.exercises.push({name:document.getElementById('exerciseName').value,sets:Number(document.getElementById('exerciseSets').value),reps:Number(document.getElementById('exerciseReps').value),weight:Number(document.getElementById('exerciseWeight').value)||0,day:document.getElementById('exerciseDay').value,date:today()});e.target.reset();save()});
+document.getElementById('vitaminForm').addEventListener('submit',e=>{e.preventDefault();data.vitamins.push({name:document.getElementById('vitaminName').value,done:false});e.target.reset();save()});
+document.getElementById('weightForm').addEventListener('submit',e=>{e.preventDefault();data.weight=Number(document.getElementById('weightInput').value);data.weights.push({date:today(),value:data.weight});save()});
+function drawChart(){const c=document.getElementById('weightChart'),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);ctx.strokeStyle='#42484c';ctx.lineWidth=1;for(let i=1;i<5;i++){ctx.beginPath();ctx.moveTo(35,i*h/5);ctx.lineTo(w-15,i*h/5);ctx.stroke()}const arr=data.weights.slice(-12);if(!arr.length)return;const vals=arr.map(x=>x.value),min=Math.min(...vals)-1,max=Math.max(...vals)+1;ctx.strokeStyle='#ff7a1a';ctx.lineWidth=4;ctx.beginPath();arr.forEach((x,i)=>{const px=40+(arr.length===1?0:i*(w-70)/(arr.length-1)),py=h-25-(x.value-min)/(max-min)*(h-55);i?ctx.lineTo(px,py):ctx.moveTo(px,py)});ctx.stroke();arr.forEach((x,i)=>{const px=40+(arr.length===1?0:i*(w-70)/(arr.length-1)),py=h-25-(x.value-min)/(max-min)*(h-55);ctx.fillStyle='#a5e34b';ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fill()})}
+function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='forge-fitness-data.json';a.click();URL.revokeObjectURL(a.href)}
+function clearData(){if(confirm('This will permanently clear your Forge Fitness data on this device. Continue?')){data=structuredClone(defaults);save()}}
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+render();
+</script>
+</body></html>
